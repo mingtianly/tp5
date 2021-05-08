@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>添加</title>
+    <link rel="stylesheet" href="__STATIC__/layui/css/layui.css">
+    <script src="__STATIC__/layui/layui.all.js"></script>
+</head>
+<body>
+<form class="layui-form" id="form1" style="padding: 20px;">
+    <if (isset($info.id))>
+        <input type="hidden" name="id" value="<{$info.id|default=''}>">
+    </if>
+    <div class="layui-form-item">
+        <label class="layui-form-label">用户名</label>
+        <div class="layui-input-block">
+            <input type="text" name="name" value="<{$info.name|default=''}>" lay-verify="required" placeholder="请输入用户名" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">姓名</label>
+        <div class="layui-input-block">
+            <input type="text" name="nick_name" value="<{$info.nick_name|default=''}>" lay-verify="required" placeholder="请输入姓名" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">密码</label>
+        <div class="layui-input-block">
+            <input type="password" name="password" value="" lay-verify="required" placeholder="请输入密码" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">重复密码</label>
+        <div class="layui-input-block">
+            <input type="password" name="password2" value="" lay-verify="required" placeholder="请再次输入密码" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">所属角色</label>
+        <div class="layui-input-block">
+            <select name="ar_id">
+                <volist name="roleList" id="v">
+                    <option value="<{$v.id}>" <eq name="$info.ar_id|default=''" value="$v.id">selected</eq> ><{$v.name}></option>
+                </volist>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">手机号</label>
+        <div class="layui-input-block">
+            <input type="number" name="phone" value="<{$info.phone|default=''}>" lay-verify="required|phone" placeholder="请输入名称" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">邮箱</label>
+        <div class="layui-input-block">
+            <input type="text" name="email" value="<{$info.email|default=''}>" lay-verify="email" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">备注</label>
+        <div class="layui-input-block">
+            <textarea class="layui-textarea" rows="3" name="intro"><{$info.intro|default=''}></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item layui-hide">
+        <input type="button" lay-submit lay-filter="submit" id="submit" value="确认">
+    </div>
+</form>
+</body>
+</html>
+<script>
+    var table = layui.table,
+        form = layui.form,
+        layer = layui.layer,
+        $ = layui.$;
+    form.render();
+    layui.use('element', function () {
+        const element = layui.element;
+        element.init();
+    });
+</script>

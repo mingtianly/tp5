@@ -1,0 +1,50 @@
+<include file="public/content_header"></include>
+<!--主体内容 BEGIN-->
+<div style="padding:0 0 0 0">
+    <div class="layui-card">
+        <div class="layui-card-header">
+            重置密码
+        </div>
+        <div class="layui-card-body">
+            <form class="layui-form" id="form1" style="padding: 20px;">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">用户名</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="name" value="" lay-verify="required" placeholder="请输入重置密码的用户名" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">新密码</label>
+                    <div class="layui-input-block">
+                        <input type="password" name="password" value="" lay-verify="required" placeholder="请输入密码" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">重复密码</label>
+                    <div class="layui-input-block">
+                        <input type="password" name="password2" value="" lay-verify="required" placeholder="请再次输入密码" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button type="button" class="layui-btn" lay-submit="" lay-filter="submit">立即提交</button>
+                        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!--主体内容 END-->
+
+<script>
+    var table = layui.table;
+    var form = layui.form;
+    form.render();
+    form.on('submit(submit)',function (data) {
+        var field = data.field;
+        $.post("<{:url('Access/resetAct')}>",field,function (e) {
+            showMsg(e.msg,e.code)
+        },'json');
+    })
+</script>

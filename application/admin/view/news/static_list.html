@@ -1,0 +1,148 @@
+<include file="public/content_header"></include>
+<!--主体内容 BEGIN-->
+<div style="padding:0 0 0 0">
+    <div class="layui-card">
+        <div class="layui-card-header layuiadmin-card-header-auto">
+            <!--搜索区域 BEGIN-->
+            <form action="" class="layui-form searchForm" lay-filter="search">
+                <div class="layui-form-item">
+                    <div class="layui-inline" id="search">
+                        <div class="layui-inline">
+                            <label class="layui-form-label">选择类型</label>
+                            <div class="layui-input-block">
+                                <select name="type">
+                                    <option value="">请选择类型</option>
+                                    <volist name=":config('type.static')" id="v">
+                                        <option value="<{$key}>"><{$v}></option>
+                                    </volist>
+                                </select>
+                            </div>
+                        </div>
+                    
+                    </div>
+                    <div class="layui-inline">
+                        <button class="layui-btn" type="button" data-type="search">
+                            <i class="layui-icon layui-icon-search"></i>
+                        </button>
+                        <button class="layui-btn" type="reset" data-type="clear">
+                            <i class="layui-icon layui-icon-refresh"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+            <!--搜索区域 END-->
+        </div>
+        <div class="layui-card-body">
+            <!--表格主体 BEGIN-->
+            <table class="layui-hide" id="test" lay-filter="test"></table>
+            <!--表格主体 END-->
+        </div>
+    </div>
+</div>
+<!--主体内容 END-->
+
+<!--右侧固定栏 BEGIN-->
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+<!--右侧固定栏 END-->
+
+<!--表格自定义按钮 BEGIN-->
+<script type="text/html" id="toolbarDemo">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-sm" style="background-color: #1a242f" onclick="reload()">
+            <i class="layui-icon layui-icon-refresh"></i>
+        </button>
+        <button class="layui-btn layui-btn-sm" lay-event="add" onclick="add()"><i class="layui-icon"></i>添加</button>
+        <button class="layui-btn layui-btn-sm layui-btn-danger layui-btn-disabled" id="btn-del" disabled
+                lay-event="del" onclick="delAll()"><i class="layui-icon"></i>删除
+        </button>
+    </div>
+</script>
+<script type="text/html" id="content">
+    <a href="#" onclick="getContent({{d.id}})">点击预览</a>
+</script>
+<!--表格自定义按钮 END-->
+<script>
+    var table = layui.table;
+    var form = layui.form;
+    form.render();
+    var controller = "News";
+    var model = "Static";
+    var zhujian = "id";
+    var title = "静态页表";
+    var tableUrl = "<{:url('" + controller + "/ajaxGet" + model + "List')}>";
+    var cols = [
+        {type: 'checkbox', fixed: 'left'}
+        , {field: 'id', title: 'ID', width: 80, sort: true, unresize: true}
+        , {field: 'title', title: '标题', search: true}
+        , {field: 'type', title: '类型', width: 150, sort: true}
+        , {field: 'intro', title: '内容', width: 300, templet: '#content'}
+        , {field: 'create_time', title: '添加时间', width: 160, fixed: 'right', sort: true}
+        , {fixed: 'right', title: '操作', align: 'center', toolbar: '#barDemo', width: 150}
+    ];
+
+    // 监听行工具事件
+    function tool(obj) {
+        if (obj.event === 'edit') {
+            window.location.href = "<{:url('" + controller + "/add" + model + "')}>?id=" + obj.data[zhujian];
+        } else if (obj.event === 'del') {
+            layer.confirm('您确定要删除吗？删除后无法恢复！', function (index) {
+                $.post("<{:url('" + controller + "/del" + model + "Act')}>", {id: obj.data[zhujian]}, function (e) {
+                    if (e.code == 0) {
+                        showMsg(e.msg, false);
+                    } else {
+                        showMsg(e.msg);
+                    }
+                }, "json");
+            });
+        }
+    }
+
+    // 添加
+    function add() {
+        window.location.href = "<{:url('" + controller + "/add" + model + "')}>";
+    }
+
+    //删除多选
+    function delAll() {
+        var checkStatus = table.checkStatus('test'); //idTest 即为基础参数 id 对应的值
+        var list = [];
+        for (var i = 0; i < checkStatus.data.length; i++) {
+            list.push(checkStatus.data[i][zhujian]);
+        }
+        layer.open({
+            content: '确定删除' + checkStatus.data.length + '条数据吗？',
+            btn: ['确认', '取消'],
+            yes: function () {
+                $.post("<{:url('" + controller + "/del" + model + "AllAct')}>", {list: list}, function (e) {
+                    if (e.code == 1) {
+                        showMsg(e.msg)
+                    } else {
+                        showMsg(e.msg, false);
+                    }
+                }, "json");
+            }
+        })
+    }
+
+    function getContent(id) {
+        $.post("<{:url('" + controller + "/get" + model + "Content')}>", {id: id}, function (e) {
+            if (e.code == 0) {
+                showMsg(e.msg, false)
+            } else {
+                $("#ctn").html(e.content);
+                layer.open({
+                    type: 1,
+                    title: false,
+                    shadeClose: true,
+                    yourclass: '',
+                    area: ['50%', '80%'],
+                    content: $("#ctn")
+                });
+            }
+        }, 'json')
+    }
+</script>
+<script src="/static/admin/table.js"></script>

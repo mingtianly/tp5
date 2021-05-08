@@ -1,0 +1,237 @@
+<include file="public/content_header"></include>
+<style>
+    .layui-form-label {
+        width: 110px;
+    }
+    .layui-input-block {
+        width: 40%;
+        margin-left: 140px;
+    }
+</style>
+<!--主体内容 BEGIN-->
+<div style="padding:0 0 0 0">
+    <div class="layui-card">
+        <form class="layui-form" style="padding: 20px">
+            <div class="layui-tab">
+                <ul class="layui-tab-title">
+                    <li class="layui-this">网站设置</li>
+                    <li>微信参数配置</li>
+                    <li>支付宝参数配置</li>
+                </ul>
+                <div class="layui-tab-content ">
+                    <!--网站设置-->
+                    <div class="layui-tab-item layui-show">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">网站标题</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="my[web_title]" value="<{:config('my.web_title')}>"
+                                       lay-verify="required" autocomplete="off" class="layui-input">
+                                <p style="color: #ff766c"></p>
+                            </div>
+                            <div class="layui-form-mid layui-word-aux"></div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">网站名称</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="my[web_name]" value="<{:config('my.web_name')}>"
+                                       lay-verify="required" autocomplete="off" class="layui-input">
+                                <p style="color: #ff766c"></p>
+                            </div>
+                            <div class="layui-form-mid layui-word-aux"></div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">是否开启余额</label>
+                            <div class="layui-input-block">
+                                <input type="checkbox" name="my[on_money_a]" value="1" <eq name=":config('my.on_money_a')" value="1">checked</eq> lay-skin="switch" lay-text="开启|关闭" >
+                                <p style="color: #ff766c"></p>
+                            </div>
+                            <div class="layui-form-mid layui-word-aux"></div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">是否开启积分</label>
+                            <div class="layui-input-block">
+                                <input type="checkbox" name="my[on_money_b]" value="1" <eq name=":config('my.on_money_b')" value="1">checked</eq> lay-skin="switch" lay-text="开启|关闭" >
+                                <p style="color: #ff766c"></p>
+                            </div>
+                            <div class="layui-form-mid layui-word-aux"></div>
+                        </div>
+                        
+                        <button type="button" class="layui-btn" lay-submit lay-filter="submit">修改</button>
+                    </div>
+                    <!--微信参数配置-->
+                    <div class="layui-tab-item">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">公众号
+                                <i class="layui-icon layui-icon-about" data-text="appid"></i>
+                            </label>
+                            <div class="layui-input-block">
+                                <input type="text" name="wxpay[appid]" value="<{:config('wxpay.appid')}>"
+                                       lay-verify="required" autocomplete="off" class="layui-input">
+                                <p style="color: #ff766c"></p>
+                            </div>
+                            <div class="layui-form-mid layui-word-aux"></div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">应用密钥
+                                <i class="layui-icon layui-icon-about" data-text="AppSecret"></i>
+                            </label>
+                            <div class="layui-input-block">
+                                <input type="text" name="wxpay[AppSecret]" value="<{:config('wxpay.AppSecret')}>"
+                                       lay-verify="required" autocomplete="off" class="layui-input">
+                                <p style="color: #ff766c"></p>
+                            </div>
+                            <div class="layui-form-mid layui-word-aux"></div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">商户号
+                                <i class="layui-icon layui-icon-about" data-text="mch_id"></i>
+                            </label>
+                            <div class="layui-input-block">
+                                <input type="text" name="wxpay[mch_id]" value="<{:config('wxpay.mch_id')}>"
+                                       lay-verify="required" autocomplete="off" class="layui-input">
+                                <p style="color: #ff766c"></p>
+                            </div>
+                            <div class="layui-form-mid layui-word-aux"></div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">秘钥
+                                <i class="layui-icon layui-icon-about" data-text="key"></i>
+                            </label>
+                            <div class="layui-input-block">
+                                <input type="text" name="wxpay[key]" value="<{:config('wxpay.key')}>"
+                                       lay-verify="required"
+                                       autocomplete="off" class="layui-input">
+                                <p style="color: #ff766c"></p>
+                            </div>
+                            <div class="layui-form-mid layui-word-aux"></div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">回调地址
+                                <i class="layui-icon layui-icon-about" data-text="notify_url"></i>
+                            </label>
+                            <div class="layui-input-block">
+                                <input type="text" name="wxpay[notify_url]" value="<{:config('wxpay.notify_url')}>"
+                                       lay-verify="required" autocomplete="off" class="layui-input">
+                                <p style="color: #ff766c"></p>
+                            </div>
+                            <div class="layui-form-mid layui-word-aux"></div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">订单超时关闭时间</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="wxpay[order_over_time]"
+                                       value="<{:config('wxpay.order_over_time')}>" lay-verify="required"
+                                       autocomplete="off" class="layui-input">
+                                <p style="color: #ff766c">（分钟）</p>
+                            </div>
+                            <div class="layui-form-mid layui-word-aux"></div>
+                        </div>
+                        <button type="button" class="layui-btn" lay-submit lay-filter="submit">修改</button>
+                    </div>
+                    <!--支付宝参数配置-->
+                    <div class="layui-tab-item">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">APPID
+                                <i class="layui-icon layui-icon-about" data-text="app_id"></i>
+                            </label>
+                            <div class="layui-input-block">
+                                <input type="text" name="alipay[app_id]" value="<{:config('alipay.app_id')}>"
+                                       autocomplete="off" class="layui-input">
+                                <p style="color: #ff766c"></p>
+                            </div>
+                            <div class="layui-form-mid layui-word-aux"></div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">PID
+                                <i class="layui-icon layui-icon-about"
+                                   data-text="签约的支付宝账号对应的支付宝唯一用户号，以 2088 开头的 16 位纯数字组成。"></i>
+                            </label>
+                            <div class="layui-input-block">
+                                <input type="text" name="alipay[pid]" value="<{:config('alipay.pid')}>"
+                                       autocomplete="off" class="layui-input">
+                                <p style="color: #ff766c"></p>
+                            </div>
+                            <div class="layui-form-mid layui-word-aux"></div>
+                        </div>
+                        
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">私钥
+                                <i class="layui-icon layui-icon-about" data-text="merchant_private_key"></i>
+                            </label>
+                            <div class="layui-input-block">
+                                <textarea class="layui-textarea" name="alipay[merchant_private_key]"><{:config('alipay.merchant_private_key')}></textarea>
+                                <p style="color: #ff766c"></p>
+                            </div>
+                            <div class="layui-form-mid layui-word-aux"></div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">支付宝公钥
+                                <i class="layui-icon layui-icon-about" data-text="alipay_public_key"></i>
+                            </label>
+                            <div class="layui-input-block">
+                                <textarea class="layui-textarea" name="alipay[alipay_public_key]"><{:config('alipay.alipay_public_key')}></textarea>
+                                <p style="color: #ff766c"></p>
+                            </div>
+                            <div class="layui-form-mid layui-word-aux"></div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">网关
+                                <i class="layui-icon layui-icon-about" data-text="gateway_url"></i>
+                            </label>
+                            <div class="layui-input-block">
+                                <input type="text" name="alipay[gateway_url]" value="<{:config('alipay.gateway_url')}>"
+                                       autocomplete="off" class="layui-input">
+                                <p style="color: #ff766c"></p>
+                            </div>
+                            <div class="layui-form-mid layui-word-aux"></div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">回调地址
+                                <i class="layui-icon layui-icon-about" data-text="notify_url"></i>
+                            </label>
+                            <div class="layui-input-block">
+                                <input type="text" name="alipay[notify_url]" value="<{:config('alipay.notify_url')}>"
+                                       autocomplete="off" class="layui-input">
+                                <p style="color: #ff766c"></p>
+                            </div>
+                            <div class="layui-form-mid layui-word-aux"></div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">订单超时关闭时间</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="alipay[order_over_time]"
+                                       value="<{:config('alipay.order_over_time')}>" autocomplete="off"
+                                       class="layui-input">
+                                <p style="color: #ff766c">（分钟）</p>
+                            </div>
+                            <div class="layui-form-mid layui-word-aux"></div>
+                        </div>
+                        <button type="button" class="layui-btn" lay-submit lay-filter="submit">修改</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<!--主体内容 END-->
+
+<script>
+    var form = layui.form;
+    form.render();
+    form.on('submit(submit)', function (data) {
+        var field = data.field;
+        $.post("<{:url('System/setConfigAct')}>", field, function (e) {
+            showMsg(e.msg, e.code)
+        }, 'json')
+    });
+    $(".layui-form-item label i").hover(function () {
+        if ($(this).attr('data-text') != '') {
+            layer.tips($(this).attr('data-text'), this, {
+                tips: [1]
+                // 上右下左四个方向，通过1-4进行方向设定
+            });
+        }
+    }, function () {
+        layer.closeAll();
+    });
+</script>

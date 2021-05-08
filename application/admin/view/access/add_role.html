@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>添加</title>
+    <link rel="stylesheet" href="__STATIC__/layui/css/layui.css">
+    <script src="__STATIC__/layui/layui.all.js"></script>
+</head>
+<body>
+<form class="layui-form" id="form1" style="padding: 20px;">
+    <if (isset($info.id))>
+        <input type="hidden" name="id" value="<{$info.id|default=''}>">
+    </if>
+    <div class="layui-form-item">
+        <label class="layui-form-label">角色名</label>
+        <div class="layui-input-block">
+            <input type="text" name="name" value="<{$info.name|default=''}>" lay-verify="required" placeholder="请输入名称"
+                   autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">角色权限</label>
+        <div class="layui-input-block">
+            <div id="tree"></div>
+            <input type="hidden" name="access" value="<{$info.access|default=''}>" lay-verify=""
+                   placeholder="请输入角色权限" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">备注</label>
+        <div class="layui-input-block">
+            <textarea class="layui-textarea" rows="3" name="intro" lay-verify="required"
+                      placeholder="角色介绍"><{$info.intro|default=''}></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item layui-hide">
+        <input type="button" lay-submit lay-filter="submit" id="submit" value="确认">
+    </div>
+</form>
+</body>
+</html>
+<script>
+    var table = layui.table,
+        form = layui.form,
+        layer = layui.layer,
+        element = layui.element,
+        tree = layui.tree,
+        $ = layui.$;
+    form.render();
+    element.init();
+    var id = "<{$info.id|default=''}>";
+    var ids = "<{$info.access|default=''}>";
+    $.post("<{:url('Access/getRoleIdList')}>",{id:id},function (e) {
+        tree.render({
+            elem: "#tree"
+            ,showCheckbox:true
+            ,id:"tree"
+            , data: e
+        });
+        tree.setChecked('tree',ids.split(','));
+    },'json');
+    form.on("submit(submit)",function (data) {
+        // var checkedData = tree.getChecked('tree'); //获取选中节点的数据
+        // var ids = getChildNodes(checkedData,[]);
+        // data.field.access = ids.join();
+    });
+    function getChildNodes(treeNode, result) {
+        for (var i in treeNode) {
+            let id = treeNode[i].id;
+            if(id.toString().indexOf('F') == -1){
+                result.push(treeNode[i].id);
+            }
+            result = getChildNodes(treeNode[i].children, result);
+        }
+        return result;
+    }
+    
+</script>

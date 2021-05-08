@@ -1,0 +1,203 @@
+<include file="public/content_header"></include>
+<style>
+    .layui-table-cell {
+        /*height: auto;*/
+    }
+</style>
+<!--主体内容 BEGIN-->
+<div style="padding:0 0 0 0">
+    <div class="layui-card">
+        <div class="layui-card-header layuiadmin-card-header-auto">
+            <!--搜索区域 BEGIN-->
+            <form action="" class="layui-form searchForm" lay-filter="search">
+                <div class="layui-form-item">
+                    <div class="layui-inline" id="search">
+                        <div class="layui-inline">
+                            <label class="layui-form-label">搜索类型</label>
+                            <div class="layui-input-block">
+                                <select name="type">
+                                    <option value="">请选择类型</option>
+                                    <volist name="typeList" id="v">
+                                        <option value="<{$v.type}>"><{$v.type}></option>
+                                    </volist>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <button class="layui-btn" type="button" data-type="search">
+                            <i class="layui-icon layui-icon-search"></i>
+                        </button>
+                        <button class="layui-btn" type="reset" data-type="clear">
+                            <i class="layui-icon layui-icon-refresh"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+            <!--搜索区域 END-->
+        </div>
+        <div class="layui-card-body">
+            <!--表格主体 BEGIN-->
+            <table class="layui-hide" id="test" lay-filter="test"></table>
+            <!--表格主体 END-->
+        </div>
+    </div>
+</div>
+<!--主体内容 END-->
+
+<!--右侧固定栏 BEGIN-->
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+<!--右侧固定栏 END-->
+
+<!--表格自定义按钮 BEGIN-->
+<script type="text/html" id="toolbarDemo">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-sm" style="background-color: #1a242f" onclick="reload()">
+            <i class="layui-icon layui-icon-refresh"></i>
+        </button>
+        <button type="button" class="layui-btn layui-btn-sm" id="test2">
+            <i class="layui-icon" style="font-size: 14px"></i>
+            上传文件
+        </button>
+        <button class="layui-btn layui-btn-sm layui-btn-danger layui-btn-disabled" id="btn-del" disabled
+                lay-event="del" onclick="delAll()"><i class="layui-icon"></i>删除
+        </button>
+    </div>
+</script>
+<script type="text/html" id="name">
+    {{# if(d.type == 'jpg' || d.type == 'png'){ }}
+    <img src="{{d.url}}" style="width: 28px;height: 28px" alt="">
+    {{# } else { }}
+    {{d.name}}
+    {{# } }}
+</script>
+<script type="text/html" id="url">
+    <span class="layui-badge layui-bg-gray copy" data-clipboard-text="{{d.url}}">{{d.url}}</span>
+</script>
+<script type="text/html" id="size">
+    {{d.size_text}}
+</script>
+<script type="text/html" id="download">
+    <a href="<{:url('Download/file')}>?url={{d.url}}" onclick="download('{{d.id}}')">点击下载</a>
+</script>
+<!--表格自定义按钮 END-->
+<script>
+    var table = layui.table;
+    var form = layui.form;
+    form.render();
+    var controller = "Resource";
+    var model = "Resource";
+    var zhujian = "id";
+    var title = "模块列表";
+    var tableUrl = "<{:url('" + controller + "/ajaxGet" + model + "List')}>";
+    var cols = [
+        {type: 'checkbox', fixed: 'left'}
+        , {field: 'id', title: 'ID', width: 80, sort: true, unresize: true}
+        , {field: 'name', title: '文件名', sort: false, search: true, width: 200, templet: '#name'}
+        , {field: 'url', title: '文件路径', sort: false, search: false, minwidth: 150, templet: '#url'}
+        , {field: 'url', title: '下载', sort: false, search: false, width: 150, templet: '#download'}
+        , {field: 'size', title: '文件大小', sort: true, search: false, width: 150, templet: '#size'}
+        , {field: 'create_time', title: '上传时间', sort: true, width: 200}
+        , {fixed: 'right', title: '操作', align: 'center', toolbar: '#barDemo', width: 150}
+    ];
+
+    // 监听行工具事件
+    function tool(obj) {
+        if (obj.event === 'del') {
+            layer.confirm('您确定要删除吗？删除后无法恢复！', function (index) {
+                $.post("<{:url('" + controller + "/del" + model + "Act')}>", {
+                    id: obj.data[zhujian],
+                    url: obj.data.url
+                }, function (e) {
+                    if (e.code == 0) {
+                        showMsg(e.msg, false);
+                    } else {
+                        showMsg(e.msg);
+                    }
+                }, "json");
+            });
+        }
+    }
+    function download(id) {
+        $.get("<{:url('" + controller + "/down" + model + "Act')}>",{id:id},function (e) {
+            console.log(e)
+        },'json');
+    }
+    //删除多选
+    function delAll() {
+        var checkStatus = table.checkStatus('test'); //idTest 即为基础参数 id 对应的值
+        var list = [];
+        let url = [];
+        for (var i = 0; i < checkStatus.data.length; i++) {
+            list.push(checkStatus.data[i][zhujian]);
+            url.push(checkStatus.data[i].url);
+        }
+        layer.open({
+            content: '确定删除' + checkStatus.data.length + '条数据吗？',
+            btn: ['确认', '取消'],
+            yes: function () {
+                $.post("<{:url('" + controller + "/del" + model + "AllAct')}>", {list: list, url: url}, function (e) {
+                    if (e.code == 1) {
+                        showMsg(e.msg)
+                    } else {
+                        showMsg(e.msg, false);
+                    }
+                }, "json");
+            }
+        })
+    }
+    function done() {
+        $(".layui-table img").bind("click",function () {
+            let src = $(this).attr('src');
+            layer.open({
+                type: 1,
+                title: false,
+                closeBtn: 0,
+                area: ['auto'],
+                skin: 'layui-layer-nobg', //没有背景色
+                shadeClose: true,
+                content: '<img src="'+src+'" style="max-width: 500px" width="auto" height="auto"/>'
+            });
+        });
+    }
+</script>
+<script src="/static/admin/table.js"></script>
+<script src="__STATIC__/admin/js/clipboard.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+    layui.use('upload', function () {
+        var $ = layui.jquery
+            , upload = layui.upload;
+
+        upload.render({
+            elem: '#test2'
+            , url: "<{:url('Uploads/uploadFileAct')}>"
+            , accept: 'file'
+            , size: "<{:config('my.upload_file_size')}>" * 1024
+            , before: function (obj) {
+                layer.msg('图片上传中...', {
+                    icon: 16,
+                    shade: 0.01,
+                    time: 0
+                });
+            }
+            , done: function (res) {
+                layer.closeAll();
+                showMsg(res.msg, res.code);
+            }
+            , error: function () {
+                layer.closeAll()
+            }
+        })
+    });
+    var clipboard = new ClipboardJS('.copy');
+
+    clipboard.on('success', function (e) {
+        layer.msg('复制成功')
+    });
+
+    clipboard.on('error', function (e) {
+        layer.msg('当前浏览器不支持复制')
+    });
+</script>

@@ -1,0 +1,295 @@
+<include file="public/content_header"></include>
+<style>
+    .layui-table-cell {
+        height: auto;
+    }
+</style>
+<!--主体内容 BEGIN-->
+<div style="padding:0 0 0 0">
+    <div class="layui-card">
+        <div class="layui-card-header layuiadmin-card-header-auto">
+            <!--搜索区域 BEGIN-->
+            <form action="" class="layui-form searchForm" lay-filter="search">
+                <div class="layui-form-item">
+                    <div class="layui-inline" id="search">
+                        <div class="layui-inline">
+                            <label class="layui-form-label">用户类型</label>
+                            <div class="layui-input-block">
+                                <select name="type">
+                                    <option value="">请选择</option>
+                                    <volist name=":config('type.user_type')" id="v">
+                                    <option value="<{$key}>"><{$v}></option>
+                                    </volist>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <button class="layui-btn" type="button" data-type="search">
+                            <i class="layui-icon layui-icon-search"></i>
+                        </button>
+                        <button class="layui-btn" type="reset" data-type="clear">
+                            <i class="layui-icon layui-icon-refresh"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+            <!--搜索区域 END-->
+        </div>
+        <div class="layui-card-body">
+            <!--表格主体 BEGIN-->
+            <table class="layui-hide" id="test" lay-filter="test"></table>
+            <!--表格主体 END-->
+        </div>
+    </div>
+</div>
+<!--主体内容 END-->
+
+<!--右侧固定栏 BEGIN-->
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+<!--右侧固定栏 END-->
+
+<!--表格自定义按钮 BEGIN-->
+<script type="text/html" id="toolbarDemo">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-sm" style="background-color: #1a242f" onclick="reload()">
+            <i class="layui-icon layui-icon-refresh"></i>
+        </button>
+        <button class="layui-btn layui-btn-sm" lay-event="add" onclick="add()"><i class="layui-icon"></i>添加</button>
+        <!--<button class="layui-btn layui-btn-sm layui-btn-danger layui-btn-disabled" id="btn-del" disabled-->
+        <!--        lay-event="del" onclick="delAll()"><i class="layui-icon"></i>删除-->
+        <!--</button>-->
+        <!--<button class="layui-btn layui-btn-sm layui-btn-disabled" id="btn-cz" disabled lay-filter="dropdown1"-->
+        <!--        lay-dropdown="{templateMenu: '#custMenu'}">-->
+        <!--    <i class="layui-icon layui-icon-set"></i>-->
+        <!--    <span>更多</span>-->
+        <!--</button>-->
+    </div>
+</script>
+<!--下拉更多-->
+<script type="text/html" id="custMenu">
+    [
+    [{txt: "全部激活", event: "allShow"}]
+    [{txt: "全部隐藏", event: "allHidden"}]
+    ]
+</script>
+<!--切换-->
+<script type="text/html" id="switchTpl">
+    <input type="checkbox" name="status" value="{{d.id}}" lay-skin="switch" lay-text="正常|冻结" lay-filter="hiddenDemo" {{d.status == 0 ? 'checked' : '' }} >
+</script>
+<script type="text/html" id="img">
+    <img src="{{d.image}}" style="width: 60px;height: 60px;" alt="">
+</script>
+<script type="text/html" id="money">
+    <eq name=":config('my.on_money_a')" value="1">
+        <p><{:config('type.user_money_type.a')}>:{{d.moneyA}}</p>
+    </eq>
+    <eq name=":config('my.on_money_b')" value="1">
+        <p><{:config('type.user_money_type.b')}>:{{d.moneyB}}</p>
+    </eq>
+</script>
+
+<!--表格自定义按钮 END-->
+<script>
+    var table = layui.table;
+    var form = layui.form;
+    form.render();
+    var controller = "User";
+    var model = "User";
+    var zhujian = "id";
+    var title = "用户表";
+    var tableUrl = "<{:url('" + controller + "/ajaxGet" + model + "List')}>";
+    var cols = [
+        {type: 'checkbox',hide:false}
+        , {field: 'id', title: 'ID', width: 80, sort: true, unresize: true}
+        , {field: 'name', title: '用户名', search: true, edit: 'text'}
+        , {field: 'phone', title: '手机号', search: true}
+        , {field: 'type', title: '用户类型', search: false}
+        , {field: 'image', title: '头像', width:80, templet: "#img"}
+        <eq name=":config('my.on_money_a')" value="1">
+        , {field: 'image', title: '余额', templet: "#money"}
+        <else/>
+        <eq name=":config('my.on_money_b')" value="1">
+        , {field: 'image', title: '余额', templet: "#money"}
+        </eq>
+        </eq>
+        , {field: 'status', title: '状态', width: 100, align: 'center', templet: "#switchTpl", sort: true}
+        , {field: 'intro', title: '备注'}
+        , {field: 'create_time', title: '添加时间', width: 160, fixed: 'right', sort: true}
+        , {fixed: 'right', title: '操作', align: 'center', toolbar: '#barDemo', width: 150}
+    ];
+
+    // 监听行工具事件
+    function tool(obj) {
+        if (obj.event === 'edit') {
+            layer.open({
+                type: 2,
+                title: '修改',
+                area: ['50%', '70%'],
+                maxmin: true,
+                content: ["add"+model+"?id=" + obj.data[zhujian]],
+                btn: ['确认', '取消'],
+                yes: function (index, layero) {
+                    var iframeWindow = window['layui-layer-iframe' + index],
+                        submitID = 'submit',
+                        submit = layero.find('iframe').contents().find('#' + submitID);
+                    // 监听提交
+                    iframeWindow.layui.form.on('submit(' + submitID + ')', function (data) {
+                        data.field.status = data.field.status == "on" ? 0 : Number(new Date().getTime()/1000);
+                        var field = data.field;// 获取提交的字段
+                        // 提交ajax
+                        $.post("<{:url('" + controller + "/edit" + model + "Act')}>", field, function (e) {
+                            showMsg(e.msg, e.code, function () {
+                                if (e.code == 1) {
+                                    table.reload("test", {});
+                                    layer.close(index);
+                                }
+                            });
+                        }, 'json');
+                    });
+                    submit.trigger('click');
+                },
+            });
+        } else if (obj.event === 'del') {
+            layer.confirm('您确定要删除吗？删除后无法恢复！', function (index) {
+                $.post("<{:url('" + controller + "/del" + model + "Act')}>", {id: obj.data[zhujian]}, function (e) {
+                    if (e.code == 0) {
+                        showMsg(e.msg, false);
+                    } else {
+                        showMsg(e.msg);
+                    }
+                }, "json");
+            });
+        }
+    }
+
+    // 添加
+    function add() {
+        layer.open({
+            type: 2,
+            title: '添加',
+            area: ['50%', '70%'],
+            maxmin: true,
+            content: ["add"+model],
+            btn: ['确认', '取消'],
+            yes: function (index, layero) {
+                var iframeWindow = window['layui-layer-iframe' + index],
+                    submitID = 'submit',
+                    submit = layero.find('iframe').contents().find('#' + submitID);
+                // 监听提交
+                iframeWindow.layui.form.on('submit(' + submitID + ')', function (data) {
+                    data.field.status = data.field.status == "on" ? 0 : Number(new Date().getTime()/1000);
+                    var field = data.field;// 获取提交的字段
+                    // 提交ajax
+                    $.post("<{:url('" + controller + "/add" + model + "Act')}>", field, function (e) {
+                        showMsg(e.msg, e.code, function () {
+                            if (e.code == 1) {
+                                table.reload("test", {});
+                                layer.close(index);
+                            }
+                        });
+                    }, 'json');
+                });
+                submit.trigger('click');
+            }
+        });
+    }
+
+    //删除多选
+    function delAll() {
+        var checkStatus = table.checkStatus('test'); //idTest 即为基础参数 id 对应的值
+        var list = [];
+        for (var i = 0; i < checkStatus.data.length; i++) {
+            list.push(checkStatus.data[i][zhujian]);
+        }
+        layer.open({
+            content: '确定删除' + checkStatus.data.length + '条数据吗？',
+            btn: ['确认', '取消'],
+            yes: function () {
+                $.post("<{:url('" + controller + "/del" + model + "AllAct')}>", {list: list}, function (e) {
+                    if (e.code == 1) {
+                        showMsg(e.msg)
+                    } else {
+                        showMsg(e.msg, false);
+                    }
+                }, "json");
+            }
+        })
+    }
+
+    //监听switch操作
+    form.on('switch(hiddenDemo)', function (obj) {
+        let data = {
+            id: this.value,
+            status: obj.elem.checked ? 0 : Number(new Date().getTime() / 1000)
+        };
+        $.post("<{:url('" + controller + "/switch" + model + "Act')}>", data, function (e) {
+            layer.msg(e.msg)
+        }, 'json');
+    });
+
+    //监听单元格编辑
+    table.on('edit(test)', function (obj) {
+        var value = obj.value //得到修改后的值
+            , data = obj.data //得到所在行所有键值
+            , field = obj.field; //得到字段
+        $.post("<{:url('" + controller + "/edit" + model + "FieldAct')}>", {id:data[zhujian],field:field,value:value}, function (e) {
+            layer.msg(e.msg)
+        }, 'json');
+        // layer.msg('[ID: ' + data[zhujian] + '] ' + field + ' 字段更改为：' + value);
+    });
+
+    // 更多操作
+    layui.config({
+        base: '__STATIC__/dropdown/'
+    }).use(['dropdown'], function () {
+        var dropdown = layui.dropdown;
+        // 监听菜单点击
+        dropdown.onFilter('dropdown1', function (event) {
+            var checkStatus = table.checkStatus('test');
+            var list = [];
+            var str = '冻结';
+            if (event === 'alllShow') {
+                str = '激活';
+                for (var i = 0; i < checkStatus.data.length; i++) {
+                    list.push({id: checkStatus.data[i][zhujian], status: 0});
+                }
+            } else {
+                for (var i = 0; i < checkStatus.data.length; i++) {
+                    list.push({id: checkStatus.data[i][zhujian], status: Number(new Date().getTime()/1000)});
+                }
+            }
+            layer.open({
+                content: '确定全部' + str + '选中的数据吗？',
+                btn: ['确认', '取消'],
+                yes: function () {
+                    $.post("<{:url('" + controller + "/setState" + model + "AllAct')}>", {list: list}, function (e) {
+                        if (e.code == 1) {
+                            showMsg(e.msg)
+                        } else {
+                            showMsg(e.msg, false);
+                        }
+                    }, "json");
+                }
+            })
+        })
+    });
+    function done() {
+        $(".layui-table img").bind("click",function () {
+            let src = $(this).attr('src');
+            layer.open({
+                type: 1,
+                title: false,
+                closeBtn: 0,
+                area: ['auto'],
+                skin: 'layui-layer-nobg', //没有背景色
+                shadeClose: true,
+                content: '<img src="'+src+'" style="max-width: 500px" width="auto" height="auto"/>'
+            });
+        });
+    }
+</script>
+<script src="/static/admin/table.js"></script>

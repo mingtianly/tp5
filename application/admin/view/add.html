@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>添加</title>
+    <link rel="stylesheet" href="__STATIC__/layui/css/layui.css">
+    <script src="__STATIC__/layui/layui.all.js"></script>
+</head>
+<body>
+<form class="layui-form" id="form1" style="padding: 20px;">
+    <if (isset($info.id))>
+        <input type="hidden" name="id" value="<{$info.id|default=''}>">
+    </if>
+    <div class="layui-form-item">
+        <label class="layui-form-label">名称</label>
+        <div class="layui-input-block">
+            <input type="text" name="name" value="<{$info.name|default=''}>" lay-verify="required" placeholder="请输入名称" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">排序</label>
+        <div class="layui-input-block">
+            <input type="number" name="sort" value="<{$info.sort|default=''}>" lay-verify="required|number" min="0" placeholder="请输入模块排序" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">切换</label>
+        <div class="layui-input-block">
+            <input type="checkbox" name="hidden" value="on" <eq name="info.hidden|default='1'" value="0">checked</eq> lay-skin="switch" lay-text="显示|隐藏">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">文本框</label>
+        <div class="layui-input-block">
+            <textarea class="layui-textarea" rows="3" name="intro"><{$info.intro|default=''}></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">头像</label>
+        <div class="layui-input-block">
+            <input type="text" name="avatar" lay-verify="" placeholder="请上传图片" autocomplete="off" class="layui-input">
+        </div>
+        <button style="float: left;" type="button" class="layui-btn" id="layuiadmin-upload-useradmin">上传图片</button><input class="layui-upload-file" type="file" accept="image/*" name="file">
+    </div>
+    <div class="layui-form-item" lay-filter="sex">
+        <label class="layui-form-label">选择性别</label>
+        <div class="layui-input-block">
+            <input type="radio" name="sex" value="男" title="男" checked=""><div class="layui-unselect layui-form-radio layui-form-radioed"><i class="layui-anim layui-icon layui-anim-scaleSpring"></i><div>男</div></div>
+            <input type="radio" name="sex" value="女" title="女"><div class="layui-unselect layui-form-radio"><i class="layui-anim layui-icon"></i><div>女</div></div>
+        </div>
+    </div>
+    <div class="layui-form-item layui-hide">
+        <input type="button" lay-submit lay-filter="submit" id="submit" value="确认">
+    </div>
+</form>
+</body>
+</html>
+<script>
+    var table = layui.table,
+        form = layui.form,
+        layer = layui.layer,
+        $ = layui.$;
+    form.render();
+    layui.use('element', function () {
+        const element = layui.element;
+        element.init();
+    });
+</script>

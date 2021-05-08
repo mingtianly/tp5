@@ -1,0 +1,184 @@
+<include file="public/content_header"></include>
+<style>
+    .layui-form-label {
+        width: 140px;
+    }
+    
+    .layui-input-block {
+        width: 30%;
+        margin-left: 170px;
+    }
+</style>
+<style type="text/css">
+    .uploader-list {
+        margin-left: -15px;
+    }
+    
+    .uploader-list .handle {
+        position: relative;
+        background-color: black;
+        color: white;
+        filter: alpha(Opacity=80);
+        -moz-opacity: 0.5;
+        opacity: 0.5;
+        width: 200px;
+        text-align: right;
+        height: 18px;
+        margin-bottom: -18px;
+        display: none;
+    }
+    
+    .uploader-list .handle i {
+        margin-right: 5px;
+    }
+    
+    .uploader-list .handle i:hover {
+        cursor: pointer;
+    }
+    
+    .uploader-list .file-iteme {
+        margin: 12px 0 0 15px;
+        padding: 1px;
+        float: left;
+    }
+</style>
+<!--主体内容 BEGIN-->
+<div style="padding:0 0 0 0">
+    <div class="layui-card">
+        <form class="layui-form" style="padding: 20px">
+            <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;">
+                <legend>上传网站LOGO</legend>
+            </fieldset>
+            <div class="layui-upload">
+                <button type="button" class="layui-btn" id="test1">上传图片</button>
+                <div class="layui-upload-list">
+                    <img class="layui-upload-img" src="<{$info.logo|default=''}>" style="width: 120px;height: 120px"
+                         id="demo1">
+                    <p id="demoText"></p>
+                </div>
+            </div>
+            <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;">
+                <legend>上传轮播图</legend>
+            </fieldset>
+            
+            <div class="layui-upload">
+                <button type="button" class="layui-btn" id="test2">上传轮播图</button>
+                <div class="layui-form-mid layui-word-aux" style="float: unset;display: inline">*上传轮播图后请点击“提交”</div>
+                <blockquote class="layui-elem-quote layui-quote-nm" style="margin-top: 10px;">
+                    预览图：
+                    <div class="layui-upload-list uploader-list" style="overflow: auto;" id="demo2">
+                        <volist name="info.lb" id="v">
+                            <if ($v!="" )>
+                                <div id="" class="file-iteme">
+                                    <div class="handle"><i class="layui-icon layui-icon-delete"></i></div>
+                                    <img style="width: 200px;height: 100px;" src="<{$v}>">
+                                    <input type="hidden" name="images[]" value="<{$v}>">
+                                </div>
+                            </if>
+                        </volist>
+                    </div>
+                </blockquote>
+            </div>
+            <div class="layui-form-item" style="margin-top: 10px">
+                <button type="button" class="layui-btn" lay-submit lay-filter="submit">提交</button>
+            </div>
+        </form>
+    </div>
+</div>
+<!--主体内容 END-->
+
+<script>
+    var form = layui.form;
+    form.render();
+    layui.use('upload', function () {
+        var $ = layui.jquery
+            , upload = layui.upload;
+
+        //普通图片上传
+        var uploadInst = upload.render({
+            elem: '#test1'
+            , url: "<{:url('Uploads/uploadAct')}>"
+            , accept: 'images'
+            , size: "<{:config('my.upload_img_size')}>" * 1024
+            , before: function (obj) {
+                //预读本地文件示例，不支持ie8
+                obj.preview(function (index, file, result) {
+                    $('#demo1').attr('src', result); //图片链接（base64）
+                });
+            }
+            , done: function (res) {
+                //如果上传失败
+                if (res.code == 0) {
+                    return layer.msg(res.msg);
+                } else {
+                    $.post("<{:url('System/uploadLogoAct')}>", {logo: res.data}, function (e) {
+                        showMsg(e.msg, e.code)
+                    }, 'json');
+                }
+                //上传成功
+            }
+            , error: function () {
+                //演示失败状态，并实现重传
+                var demoText = $('#demoText');
+                demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
+                demoText.find('.demo-reload').on('click', function () {
+                    uploadInst.upload();
+                });
+            }
+        });
+
+        //多图片上传
+        var num = 10000;
+        upload.render({
+            elem: '#test2'
+            , url: "<{:url('Uploads/uploadAct')}>" //改成您自己的上传接口
+            , size: "<{:config('my.upload_img_size')}>" * 1024
+            , multiple: true
+            , before: function (obj) {
+                layer.msg('图片上传中...', {
+                    icon: 16,
+                    shade: 0.01,
+                    time: 0
+                })
+            }
+            , done: function (res) {
+                //上传完毕
+                if (res.code == 0) {
+                    showMsg(res.msg, false);
+                } else {
+                    layer.closeAll();
+                    $('.uploader-list').append(
+                        '<div id="" class="file-iteme">' +
+                        '<div class="handle"><i class="layui-icon layui-icon-delete"></i></div>' +
+                        '<img style="width: 200px;height: 100px;" src=' + res.data + '>' +
+                        '<input type="hidden" name="images['+num+']" value="' + res.data + '" />' +
+                        '</div>'
+                    );
+                    num++;
+                }
+            }
+        });
+    });
+    form.on('submit(submit)', function (data) {
+        var field = data.field;
+        delete field.file;
+        $.post("<{:url('System/setUploadLbAct')}>", field, function (e) {
+            showMsg(e.msg, e.code)
+        }, 'json')
+    });
+    $(document).on("mouseenter mouseleave", ".file-iteme", function (event) {
+        if (event.type === "mouseenter") {
+            //鼠标悬浮
+            $(this).children(".info").fadeIn("fast");
+            $(this).children(".handle").fadeIn("fast");
+        } else if (event.type === "mouseleave") {
+            //鼠标离开
+            $(this).children(".info").hide();
+            $(this).children(".handle").hide();
+        }
+    });
+    // 删除图片
+    $(document).on("click", ".file-iteme .handle", function (event) {
+        $(this).parent().remove();
+    });
+</script>

@@ -1,0 +1,10 @@
+.layui-card-header.layuiadmin-card-header-auto {
+    padding-top: 15px;
+    /*padding-bottom: 15px;*/
+    height: auto;
+}
+.layui-elem-quote{
+    background-color: #ffffff;
+}
+.showMenu.layui-layout-admin .layui-side{ left:-200px; }
+.showMenu .layui-body,.showMenu .layui-footer{ left:0; }
